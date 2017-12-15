@@ -1,0 +1,608 @@
+SQL> REM 1
+SQL> SELECT SYSDATE FROM DUAL;
+
+SYSDATE                                                                         
+---------                                                                       
+15-DEC-17                                                                       
+
+SQL> SELECT TO_CHAR(SYSDATE,'HH:MI:SS') FROM DUAL;
+
+TO_CHAR(                                                                        
+--------                                                                        
+02:58:28                                                                        
+
+SQL> REM 3
+SQL> SELECT TO_CHAR(SYSDATE,'DAY-DD-MM-YYYY') FROM DUAL;
+
+TO_CHAR(SYSDATE,'DAY-DD-MM-YYYY')                                               
+-----------------------------------------------                                 
+FRIDAY   -15-12-2017                                                            
+
+SQL> REM 4
+SQL> SELECT TO_CHAR(SYSDATE,'HH:MI:SS') FROM DUAL;
+
+TO_CHAR(                                                                        
+--------                                                                        
+02:59:23                                                                        
+
+SQL> REM 5
+SQL> SELECT TRUNC(SYSDATE) - FI
+  2  FROM PLAN_DOCENTE
+  3  WHERE
+  4  DNI=8888
+  5  AND CAS=11;
+
+TRUNC(SYSDATE)-FI                                                               
+-----------------                                                               
+             3027                                                               
+
+SQL> SELECT P FROM PROFESOR
+  2  NATURAL JOIN PLAN_DOCENTE
+  3  WHERE((TRUNC(SYSDATE)-TRUNC(FI)>365) && FF IS NOT NULL);
+Enter value for ff: 
+old   3: WHERE((TRUNC(SYSDATE)-TRUNC(FI)>365) && FF IS NOT NULL)
+new   3: WHERE((TRUNC(SYSDATE)-TRUNC(FI)>365)  IS NOT NULL)
+WHERE((TRUNC(SYSDATE)-TRUNC(FI)>365)  IS NOT NULL)
+                               *
+ERROR at line 3:
+ORA-00907: missing right parenthesis 
+
+
+SQL> 
+SQL> SELECT P FROM PROFESOR
+  2  NATURAL JOIN PLAN_DOCENTE
+  3  WHERE((TRUNC(SYSDATE)-TRUNC(FI)>365) AND FF IS NOT NULL);
+
+P                                                                               
+------------------------------------------------------------                    
+JUAN                                                                            
+CARLOS                                                                          
+MARIA                                                                           
+CARMEN                                                                          
+DAVID                                                                           
+DAVID                                                                           
+
+6 rows selected.
+
+SQL> REM 6 DE VERDAD
+SQL> SELECT DISTINCT P FROM PROFESOR
+  2  NATURAL JOIN PLAN_DOCENTE
+  3  WHERE((TRUNC(SYSDATE)-TRUNC(FI)>365) AND FF IS NOT NULL);
+
+P                                                                               
+------------------------------------------------------------                    
+JUAN                                                                            
+CARLOS                                                                          
+CARMEN                                                                          
+DAVID                                                                           
+MARIA                                                                           
+
+SQL> REM 7
+SQL> SELECT COUNT(*) FROM PROFESOR
+  2  NATURAL JOIN AREA
+  3  NATURAL JOIN DEPARTAMENTO
+  4  WHERE D=ASTROFISICA);
+WHERE D=ASTROFISICA)
+                   *
+ERROR at line 4:
+ORA-00933: SQL command not properly ended 
+
+
+SQL> SELECT COUNT(*) FROM PROFESOR
+  2  NATURAL JOIN AREA
+  3  NATURAL JOIN DEPARTAMENTO
+  4  WHERE D=ASTROFISICA;
+WHERE D=ASTROFISICA
+        *
+ERROR at line 4:
+ORA-00904: "ASTROFISICA": invalid identifier 
+
+
+SQL> REM 7 DE VERDAD
+SQL> SELECT COUNT(*) FROM PROFESOR
+  2  NATURAL JOIN AREA
+  3  NATURAL JOIN DEPARTAMENTO
+  4  WHERE D='ASTROFISICA';
+
+  COUNT(*)                                                                      
+----------                                                                      
+         1                                                                      
+
+SQL> REM 8
+SQL> SELECT D, COUNT(*)
+  2  FROM DEPARTAMENTO
+  3  NATURAL JOIN AREA
+  4  NATURAL JOIN PROFESOR
+  5  GROUP BY D;
+
+D                                                              COUNT(*)         
+------------------------------------------------------------ ----------         
+ASTROFISICA                                                           1         
+ANALISIS MATEMATICO                                                   3         
+ESTADISTICA,INVESTIGACION OPERATIVA Y COMPUTACION                     7         
+MATEMATICA FUNDAMENTAL                                                1         
+
+SQL> REM 8 PERO ORDENADO ( EL BUENO)
+SQL> SELECT D, COUNT(*)
+  2  FROM DEPARTAMENTO
+  3  NATURAL JOIN AREA
+  4  NATURAL JOIN PROFESOR
+  5  GROUP BY D
+  6  SORT BY D;
+SORT BY D
+*
+ERROR at line 6:
+ORA-00933: SQL command not properly ended 
+
+
+SQL> SELECT D, COUNT(*)
+  2  FROM DEPARTAMENTO
+  3  NATURAL JOIN AREA
+  4  NATURAL JOIN PROFESOR
+  5  SORT BY D
+  6  GROUP BY D;
+SORT BY D
+     *
+ERROR at line 5:
+ORA-00933: SQL command not properly ended 
+
+
+SQL> REM AHORA SI
+SQL> SELECT D, COUNT(*)
+  2  FROM DEPARTAMENTO
+  3  NATURAL JOIN AREA
+  4  NATURAL JOIN PROFESOR
+  5  ORDER BY D
+  6  GROUP BY D;
+GROUP BY D
+*
+ERROR at line 6:
+ORA-00933: SQL command not properly ended 
+
+
+SQL> SELECT D, COUNT(*)
+  2  FROM DEPARTAMENTO
+  3  NATURAL JOIN AREA
+  4  NATURAL JOIN PROFESOR
+  5  GROUP BY D
+  6  ORDER BY D;
+
+D                                                              COUNT(*)         
+------------------------------------------------------------ ----------         
+ANALISIS MATEMATICO                                                   3         
+ASTROFISICA                                                           1         
+ESTADISTICA,INVESTIGACION OPERATIVA Y COMPUTACION                     7         
+MATEMATICA FUNDAMENTAL                                                1         
+
+SQL> REM COMO COSTO
+SQL> REM 9
+SQL> SELECT COUNT(*)
+  2  FROM ASIGNATURA
+  3  NATURAL JOIN AREA
+  4  NATURAL JOIN DEPARTAMENTO
+  5  WHERE D=ESTADISTICA, INVESTIGACION OPERATIVA Y COMPUTACION
+  6  GROUP BY D;
+WHERE D=ESTADISTICA, INVESTIGACION OPERATIVA Y COMPUTACION
+                   *
+ERROR at line 5:
+ORA-00933: SQL command not properly ended 
+
+
+SQL> SELECT COUNT(*)
+  2  FROM ASIGNATURA
+  3  NATURAL JOIN AREA
+  4  NATURAL JOIN DEPARTAMENTO
+  5  WHERE D='ESTADISTICA, INVESTIGACION OPERATIVA Y COMPUTACION'
+  6  GROUP BY D;
+
+no rows selected
+
+SQL> REM PORQUE ERRATA EN D PROBABLEMENTE?
+SQL> REM 10
+SQL> REM COUNT(*) FROM PROFESOR
+SQL> NATURAL JOIN AREA
+SP2-0734: unknown command beginning "NATURAL JO..." - rest of line ignored.
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> SELECT COUNT(*) FROM PROFESOR
+  2  NATURAL JOIN AREA
+  3  WHERE AR LIKE 'A%'
+  4  GORUP BY AR;
+GORUP BY AR
+*
+ERROR at line 4:
+ORA-00933: SQL command not properly ended 
+
+
+SQL> SELECT COUNT(*) FROM PROFESOR
+  2  NATURAL JOIN AREA
+  3  WHERE AR LIKE 'A%'
+  4  GROUP BY AR;
+
+  COUNT(*)                                                                      
+----------                                                                      
+         1                                                                      
+         1                                                                      
+         1                                                                      
+
+SQL> SELECT COUNT(*)
+  2  FROM(
+  3  SELECT COUNT(*) AS CNT FROM PROFESOR
+  4  NATURAL JOIN AREA
+  5  WHERE AR LIKE 'A%'
+  6  GROUP BY AR)
+  7  ;
+
+  COUNT(*)                                                                      
+----------                                                                      
+         3                                                                      
+
+SQL> REM 11
+SQL> SELECT T, COUNT(*) FROM ASIGNATURA
+  2  GROUP BY T;
+
+T      COUNT(*)                                                                 
+---- ----------                                                                 
+GF            1                                                                 
+GM            2                                                                 
+GII           7                                                                 
+MII           2                                                                 
+
+SQL> REM 12
+SQL> SELECT A, CT
+  2  FROM ASIGNATURA
+  3  WHERE CT=(SELECT MAX(CT) FROM ASIGNATURA AS ASG WHERE ASG.A=ASIGNATURA.A);
+WHERE CT=(SELECT MAX(CT) FROM ASIGNATURA AS ASG WHERE ASG.A=ASIGNATURA.A)
+                                         *
+ERROR at line 3:
+ORA-00907: missing right parenthesis 
+
+
+SQL> SELECT A, MAX(CT)
+  2  FROM ASIGNATURA
+  3  WHERE ROWNUM=1
+  4  ;
+SELECT A, MAX(CT)
+       *
+ERROR at line 1:
+ORA-00937: not a single-group group function 
+
+
+SQL> SELECT A, MAX(CT)
+  2  FROM ASIGNATURA
+  3  WHERE ROWNUM=1
+  4  GROUP BY A;
+
+A                                                     MAX(CT)                   
+-------------------------------------------------- ----------                   
+BASES DE DATOS                                              3                   
+
+SQL> SELECT A, MAX(CT)
+  2  FROM ASIGNATURA
+  3  ORDER BY CT
+  4  GROUP BY A;
+GROUP BY A
+*
+ERROR at line 4:
+ORA-00933: SQL command not properly ended 
+
+
+SQL> SELECT A, MAX(CT)
+  2  FROM ASIGNATURA
+  3  GROUP BY A
+  4  ORDER BY CT
+  5  WHERE ROWNUM=1;
+WHERE ROWNUM=1
+*
+ERROR at line 5:
+ORA-00933: SQL command not properly ended 
+
+
+SQL> SELECT A, MAX(CT)
+  2  FROM ASIGNATURA
+  3  GROUP BY CT;
+SELECT A, MAX(CT)
+       *
+ERROR at line 1:
+ORA-00979: not a GROUP BY expression 
+
+
+SQL> SELECT A, MAX(CT)
+  2  FROM ASIGNATURA
+  3  GROUP BY A;
+
+A                                                     MAX(CT)                   
+-------------------------------------------------- ----------                   
+ALGEBRA                                                     3                   
+ENSEANZA DE LA MATEMATICA                                   6                   
+BASES DE DATOS                                              3                   
+INFORMATICA BASICA                                          3                   
+OPTIMIZACION                                                3                   
+CALCULO                                                     3                   
+GESTION DE RIESGOS                                          3                   
+ANALISIS COMPLEJO                                         4.5                   
+INTELIGENCIA ARTIFICIAL                                   1.5                   
+MINERIA DE DATOS                                          1.5                   
+ALMACENES DE DATOS                                        1.5                   
+
+A                                                     MAX(CT)                   
+-------------------------------------------------- ----------                   
+ASTRONOMIA                                                  3                   
+
+12 rows selected.
+
+SQL> SELECT A, CT
+  2  FROM ASIGNATURA
+  3  ORDER BY CT
+  4  WHERE ROWNUM<=1;
+WHERE ROWNUM<=1
+*
+ERROR at line 4:
+ORA-00933: SQL command not properly ended 
+
+
+SQL> SELECT A, CT
+  2  FROM ( SELECT * FROM ASIGNATURA ORDER BY CT ASC)
+  3  WHERE ROWNUM=1;
+
+A                                                          CT                   
+-------------------------------------------------- ----------                   
+INTELIGENCIA ARTIFICIAL                                   1.5                   
+
+SQL> SELECT A, CT
+  2  FROM ( SELECT * FROM ASIGNATURA ORDER BY CT DESC)
+  3  WHERE ROWNUM=1;
+
+A                                                          CT                   
+-------------------------------------------------- ----------                   
+ENSEANZA DE LA MATEMATICA                                   6                   
+
+SQL> REM 12
+SQL> SELECT A, CT
+  2  FROM ( SELECT * FROM ASIGNATURA ORDER BY CT DESC)
+  3  WHERE ROWNUM=1;
+
+A                                                          CT                   
+-------------------------------------------------- ----------                   
+ENSEANZA DE LA MATEMATICA                                   6                   
+
+SQL> REM 13
+SQL> SELECT A, CT
+  2  FROM ( SELECT * FROM ASIGNATURA ORDER BY CT ASC)
+  3  WHERE ROWNUM=1;
+
+A                                                          CT                   
+-------------------------------------------------- ----------                   
+INTELIGENCIA ARTIFICIAL                                   1.5                   
+
+SQL> REM 17
+SQL> SELECT AR FROM (SELECT *
+  2  FROM ASIGNATURA
+  3  NATURAL JOIN AREA
+  4  ORDER BY (CT+CL+CP))
+  5  WHERE ROWNUM<=1;
+
+AR                                                                              
+------------------------------------------------------------                    
+LENGUAJES Y SISTEMAS INFORMATICOS                                               
+
+SQL> REM 18
+SQL> SELECT COUNT(*) FROM (SELECT * FROM PLAN_DOCENTE WHERE DNI=1111);
+
+  COUNT(*)                                                                      
+----------                                                                      
+         2                                                                      
+
+SQL> REM ESO ESL AS CLASES NO ASIGNATURAS
+SQL> SELECT COUNT(*) FROM (SELECT DISTINCT DNI,CAS FROM PLAN_DOCENTE WHERE DNI=1111);
+
+  COUNT(*)                                                                      
+----------                                                                      
+         1                                                                      
+
+SQL> REM ME SIENTO ORGULLOSO DE ESO
+SQL> REM 19
+SQL> SELECT COUNT(CT+CL+CP) FROM (SELECT DISTINCT * FROM PLAN_DOCENTE WHERE DNI=1111);
+SELECT COUNT(CT+CL+CP) FROM (SELECT DISTINCT * FROM PLAN_DOCENTE WHERE DNI=1111)
+                   *
+ERROR at line 1:
+ORA-00904: "CP": invalid identifier 
+
+
+SQL> SELECT COUNT(CTA+CLA+CPA) FROM (SELECT DISTINCT * FROM PLAN_DOCENTE WHERE DNI=1111);
+
+COUNT(CTA+CLA+CPA)                                                              
+------------------                                                              
+                 2                                                              
+
+SQL> SELECT COUNT(CTA+CLA+CPA) FROM (SELECT * FROM PLAN_DOCENTE WHERE DNI=1111);
+
+COUNT(CTA+CLA+CPA)                                                              
+------------------                                                              
+                 2                                                              
+
+SQL> SELECT COUNT(CTA+CLA+CPA) FROM (SELECT * FROM PLAN_DOCENTE WHERE DNI=1111)
+  2  ;
+
+COUNT(CTA+CLA+CPA)                                                              
+------------------                                                              
+                 2                                                              
+
+SQL> REM 19
+SQL> SELECT SUM(CTA)+SUM(CPA)+SUM(CLA) FROM PLAN_DOCENTE WHERE DNI=1111;
+
+SUM(CTA)+SUM(CPA)+SUM(CLA)                                                      
+--------------------------                                                      
+                         9                                                      
+
+SQL> REM 20
+SQL> SELECT DNI, MAX(SUM(CTA)+SUM(CPA)+SUM(CLA)) FROM PLAN_DOCENTE ;
+SELECT DNI, MAX(SUM(CTA)+SUM(CPA)+SUM(CLA)) FROM PLAN_DOCENTE 
+                                  *
+ERROR at line 1:
+ORA-00978: nested group function without GROUP BY 
+
+
+SQL> SELECT DNI, MAX(SUM(CTA)+SUM(CPA)+SUM(CLA)) FROM PLAN_DOCENTE GROUP BY DNI;
+SELECT DNI, MAX(SUM(CTA)+SUM(CPA)+SUM(CLA)) FROM PLAN_DOCENTE GROUP BY DNI
+       *
+ERROR at line 1:
+ORA-00937: not a single-group group function 
+
+
+SQL> SELECT DNI, MAX(SUM(CTA)+SUM(CPA)+SUM(CLA)) FROM PLAN_DOCENTE GROUP BY DNI GROUP BY DNI;
+SELECT DNI, MAX(SUM(CTA)+SUM(CPA)+SUM(CLA)) FROM PLAN_DOCENTE GROUP BY DNI GROUP BY DNI
+                                                                           *
+ERROR at line 1:
+ORA-01787: only one clause allowed per query block 
+
+
+SQL> SELECT DNI, SUM(CTA)+SUM(CLA)+SUM(CPA) FROM PLAN_DOCENTE;
+SELECT DNI, SUM(CTA)+SUM(CLA)+SUM(CPA) FROM PLAN_DOCENTE
+       *
+ERROR at line 1:
+ORA-00937: not a single-group group function 
+
+
+SQL> SELECT DNI, SUM(CTA)+SUM(CLA)+SUM(CPA) FROM PLAN_DOCENTE GROUP BY DNI;
+
+       DNI SUM(CTA)+SUM(CLA)+SUM(CPA)                                           
+---------- --------------------------                                           
+      1010                         15                                           
+      1111                          9                                           
+      2020                          3                                           
+      2222                          6                                           
+      3030                          3                                           
+      3333                          9                                           
+      4444                         15                                           
+      5555                          6                                           
+      6666                          6                                           
+      7777                        7.5                                           
+      8888                          6                                           
+
+       DNI SUM(CTA)+SUM(CLA)+SUM(CPA)                                           
+---------- --------------------------                                           
+      9999                          6                                           
+
+12 rows selected.
+
+SQL> SELECT P FROM
+  2  (SELECT DNI, SUM(CTA)+SUM(CLA)+SUM(CPA) FROM PLAN_DOCENTE NATURAL JOIN PROFESOR GROUP BY DNI);
+SELECT P FROM
+       *
+ERROR at line 1:
+ORA-00904: "P": invalid identifier 
+
+
+SQL> SELECT MAX(SUMAT) FROM
+  2  SELECT DNI, SUM(CTA)+SUM(CLA)+SUM(CPA) FROM PLAN_DOCENTE GROUP BY DNI;
+SELECT DNI, SUM(CTA)+SUM(CLA)+SUM(CPA) FROM PLAN_DOCENTE GROUP BY DNI
+*
+ERROR at line 2:
+ORA-00903: invalid table name 
+
+
+SQL> SELECT MAX(SUMAT) FROM
+  2  SELECT DNI, SUM(CTA)+SUM(CLA)+SUM(CPA) AS SUMAT FROM PLAN_DOCENTE GROUP BY DNI;
+SELECT DNI, SUM(CTA)+SUM(CLA)+SUM(CPA) AS SUMAT FROM PLAN_DOCENTE GROUP BY DNI
+*
+ERROR at line 2:
+ORA-00903: invalid table name 
+
+
+SQL> SELECT MAX(SUMAT) FROM
+  2  (SELECT DNI, SUM(CTA)+SUM(CLA)+SUM(CPA) AS SUMAT FROM PLAN_DOCENTE GROUP BY DNI);
+
+MAX(SUMAT)                                                                      
+----------                                                                      
+        15                                                                      
+
+SQL> SELECT DNI,MAX(SUMAT) FROM
+  2  (SELECT DNI, SUM(CTA)+SUM(CLA)+SUM(CPA) AS SUMAT FROM PLAN_DOCENTE GROUP BY DNI)
+  3  GROUP BY DNI;
+
+       DNI MAX(SUMAT)                                                           
+---------- ----------                                                           
+      1010         15                                                           
+      1111          9                                                           
+      2020          3                                                           
+      2222          6                                                           
+      3030          3                                                           
+      3333          9                                                           
+      4444         15                                                           
+      5555          6                                                           
+      6666          6                                                           
+      7777        7.5                                                           
+      8888          6                                                           
+
+       DNI MAX(SUMAT)                                                           
+---------- ----------                                                           
+      9999          6                                                           
+
+12 rows selected.
+
+SQL> SELECT P FROM PROFESOR, MAX(SUMAT) FROM
+  2  (SELECT DNI, SUM(CTA)+SUM(CLA)+SUM(CPA) AS SUMAT FROM PLAN_DOCENTE GROUP BY DNI);
+SELECT P FROM PROFESOR, MAX(SUMAT) FROM
+                        *
+ERROR at line 1:
+ORA-00934: group function is not allowed here 
+
+
+SQL> SELECT P FROM PROFESOR, MAX(SUMAT) FROM
+  2  (SELECT DNI, SUM(CTA)+SUM(CLA)+SUM(CPA) AS SUMAT FROM PLAN_DOCENTE GROUP BY DNI)
+  3  GORUP BY DNI;
+SELECT P FROM PROFESOR, MAX(SUMAT) FROM
+                        *
+ERROR at line 1:
+ORA-00934: group function is not allowed here 
+
+
+SQL> SELECT P, MAX(SUMAT) FROM
+  2  (SELECT DNI, SUM(CTA)+SUM(CLA)+SUM(CPA) AS SUMAT FROM PLAN_DOCENTE NATURAL JOIN PROFESOR GROUP BY DNI)
+  3  GROUP BY DNI;
+SELECT P, MAX(SUMAT) FROM
+       *
+ERROR at line 1:
+ORA-00904: "P": invalid identifier 
+
+
+SQL> REM 21
+SQL> SELECT CAR, AVG(A)
+  2  GROUP BY CAR;
+GROUP BY CAR
+*
+ERROR at line 2:
+ORA-00923: FROM keyword not found where expected 
+
+
+SQL> SELECT CAR, AVG(A)
+  2  FROM ASIGNATURA
+  3  GROUP BY CAR;
+SELECT CAR, AVG(A)
+                *
+ERROR at line 1:
+ORA-01722: invalid number 
+
+
+SQL> SELECT CAR, AVG(COUNT(A))
+  2  FROM ASIGNATURA
+  3  GROUP BY CAR;
+SELECT CAR, AVG(COUNT(A))
+       *
+ERROR at line 1:
+ORA-00937: not a single-group group function 
+
+
+SQL> SELECT CAR, AVG(COUNT(A))
+  2  FROM ASIGNATURA
+  3  GROUP BY A;
+SELECT CAR, AVG(COUNT(A))
+       *
+ERROR at line 1:
+ORA-00937: not a single-group group function 
+
+
+SQL> spool off
